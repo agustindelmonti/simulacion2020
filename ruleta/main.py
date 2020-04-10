@@ -1,108 +1,61 @@
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from scipy import stats
 import pandas as pd
 import math
-import os
 
-sns.set(style="darkgrid", palette="muted", color_codes=True)
-np.random.seed()
+out_folder = './results'
 
 # Hiperparametros del modelo
-N = 10000
 min = 0
-max = 36
+max = 37
+num = 7
+
 prob = 1 / (max - min)
-results_path = f'./graphs/iter_{N}'
+mu = (max - min -1) / 2
+sigma = (max - min) / math.sqrt(12)
 
 
-def simular():
-    return np.random.randint(min, max + 1, N)
+def params(freq, mean, std, file):
+    fig, axes = plt.subplots(3, 1, figsize=(10, 6), sharex=True)
 
+    # f'Frecuencia relativa vs probabilidad \n x = {num} (n = {N})'
+    sns.lineplot(data=freq, ax=axes[0], legend=False,  dashes=False)
+    axes[0].set_ylabel('freq ')
+    axes[0].axhline(prob, color='black', ls='--', alpha=0.3,
+                    label=f"p = {format(prob, '.4f')}")
+    axes[0].legend(loc='best')
 
-def mu_approx(data):
-    mu = (max - min) / 2
-    fig, ax = plt.subplots()
+    # f'Promedio acomulado por tirada vs µ teorica \n (n = {N})'
+    sns.lineplot(data=mean, ax=axes[1], legend=False,  dashes=False)
+    axes[1].set_ylabel('prom')
+    axes[1].axhline(mu, color='black', ls='--', alpha=0.3,
+                    label=f"µ = {format(mu, '.2f')}")
+    axes[1].legend(loc='best')
 
-    # Aproximacion teorica
-    plt.axhline(y=mu, xmin=0.0, xmax=1.0, label=f"µ = {format(mu, '.2f')}", color="r")
+    # f'Desviacion standard acomulada por tirada vs σ teorica \n (n = {N})'
+    sns.lineplot(data=std, ax=axes[2], legend=False,  dashes=False)
+    axes[2].set_ylabel('std')
+    axes[2].axhline(sigma, color='black', ls='--', alpha=0.5,
+                    label=f"σ = {format(sigma, '.2f')}")
+    axes[2].legend(loc='best')
 
-    accum_mean = []
-    for k in range(1, len(data)):
-        mean = np.mean(data[:k])
-        accum_mean.append(mean)
-    plt.plot(accum_mean, 'm-', label='promedio')
-
-    ax.legend(loc='best')
-    ax.set(xlabel='iteracion', ylabel='promedio', title=f'Promedio acomulado por tirada vs µ teorica \n (n = {N})')
-    plt.tight_layout()
-    fig.savefig(f"{results_path}/accum_mean{N}.png")
-    plt.show()
-
-
-def uniform_dist(data):
-    fig, ax = plt.subplots()
-    sns.distplot(data, color="m", bins=37, label='frec. relativa')
-    plt.axhline(y=prob, xmin=0.0, xmax=1.0, label=f"prob. teorica (p = {format(prob, '.4f')})", color="r")
-
-    ax.legend(loc='best')
-    ax.set(ylabel='frecuencia relativa (fr)', title=f'Distribucion muestra (n = {N}) vs probabilidad')
-    plt.tight_layout()
-    fig.savefig(f"{results_path}/uniforme_{N}.png")
-    plt.show()
-
-
-def relative_freq(data, num):
-    accum_relative_freq = np.zeros(N)
-
-    for i in range(0, len(data) - 1):
-        abs = accum_relative_freq[i] * i
-        if data[i + 1] == num:
-            abs += 1
-        accum_relative_freq[i + 1] = abs / (i + 1)
-
-    fig, ax = plt.subplots()
-    df = pd.DataFrame(accum_relative_freq)
-    sns.lineplot(data=df[0], color="m", label='frec. relativa')
-
-    plt.axhline(y=prob, xmin=0.0, xmax=1.0, label=f"prob. teorica (p = {format(prob, '.4f')})", color="r")
-
-    ax.legend(loc='best')
-    ax.set(ylabel='frecuencia relativa (fr)', xlabel='iteracion',
-           title=f'Frecuencia relativa vs probabilidad \n x = {num} (n = {N})')
-    fig.savefig(f"{results_path}/accum_relative_freq_{N}.png")
-    plt.show()
-
-
-def std_approx(data):
-    sigma = (max - min) / math.sqrt(12)
-    fig, ax = plt.subplots()
-
-    # Aproximacion teorica
-    plt.axhline(y=sigma, xmin=0.0, xmax=1.0, label=f"σ = {format(sigma, '.2f')}", color="r")
-
-    accum_std = []
-    for k in range(1, len(data)):
-        std = np.std(data[:k])
-        accum_std.append(std)
-    plt.plot(accum_std, 'm-', label='Desviacion standard')
-
-    ax.legend(loc='best')
-    ax.set(xlabel='iteracion', ylabel='desviacion standard', title=f'Desviacion standard acomulada por tirada vs σ teorica \n (n = {N})')
-    plt.tight_layout()
-    fig.savefig(f"{results_path}/accum_std{N}.png")
-    plt.show()
+    fig.savefig(f"{out_folder}/stats_{file}.png")
 
 
 if __name__ == "__main__":
-    tirada = simular()
+    df = pd.read_csv("./results/out.txt", header=None)
+    sns.set(style="darkgrid", palette="muted", color_codes=True)
 
-    if not os.path.exists(results_path):
-        os.makedirs(results_path)
+    data = df.T
+    series = data.expanding()
+    mean, std = series.mean(), series.std()
 
-    mu_approx(tirada)
-    uniform_dist(tirada)
-    relative_freq(tirada, 6)
-    std_approx(tirada)
+    # Cuenta las ocurrencias historicas del numero num
+    freq = series.apply(lambda x: np.count_nonzero(x == num)).apply(lambda x: pd.Series(x).div(x.index + 1))
+
+    params(freq, mean, std, "")
+
+    # Promedio acomulados de parametros entre simulaciones
+    freq, mean, std = freq.mean(axis=1), mean.mean(axis=1), std.mean(axis=1)
+    params(freq, mean, std, "joined")
