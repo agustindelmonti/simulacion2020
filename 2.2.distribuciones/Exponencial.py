@@ -1,4 +1,6 @@
 import math
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # LCG Implementation
 def lcg(a, c, m, initial_seed):
@@ -32,5 +34,5 @@ media = 9
 data = []
 data = (exponencial(media, seed))
 
-for j in range(len(data)):
-    print(data[j])
+sns.distplot(data, kde=False, color="b")
+plt.show()
