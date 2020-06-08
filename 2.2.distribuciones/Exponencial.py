@@ -22,9 +22,9 @@ def random_sample(seed):
 #Exponential generator
 def exponencial(media, seed):
     sample = []
-    array = (random_sample(seed))
-    for r in range(len(array)):
-        x = - media * math.log(array[r])
+    lista = (random_sample(seed))
+    for r in range(len(lista)):
+        x = - media * math.log(lista[r])
         sample.append(x)
     return sample
 
