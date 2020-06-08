@@ -1,28 +1,12 @@
+from RandomGenerator import random_sample
 import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# LCG Implementation
-def lcg(a, c, m, initial_seed):
-    seed = initial_seed
-    while True:
-        rand = (a * seed + c) % m
-        seed = rand
-        yield rand
-
-def random_sample(seed):
-    sample = []
-    varAux = lcg(1103590199, 419329, (2 ** 32), seed)
-    for i in range(100):
-        observation = next(varAux) / (2 ** 32)
-        sample.append(observation)
-
-    return sample
-
 #Exponential generator
-def exponencial(media, seed):
+def exponencial(media, seed, n):
     sample = []
-    lista = (random_sample(seed))
+    lista = (random_sample(n, seed))
     for r in range(len(lista)):
         x = - media * math.log(lista[r])
         sample.append(x)
@@ -31,8 +15,9 @@ def exponencial(media, seed):
 #Main
 seed = 4294966661
 media = 9
+n = 50
 data = []
-data = (exponencial(media, seed))
+data = (exponencial(media, seed, n))
 
 sns.distplot(data, kde=False, color="b")
 plt.show()
