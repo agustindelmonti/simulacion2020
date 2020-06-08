@@ -1,11 +1,6 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
-import pandas as pd
 import math
 
 # LCG Implementation
-
 def lcg(a, c, m, initial_seed):
     seed = initial_seed
     while True:
@@ -22,6 +17,7 @@ def random_sample(seed):
 
     return sample
 
+#Exponential generator
 def exponencial(media, seed):
     sample = []
     array = (random_sample(seed))
