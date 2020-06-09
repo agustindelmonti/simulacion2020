@@ -2,6 +2,7 @@ import random as rn
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+sns.set_style("white")
 
 
 def exp(alpha):
@@ -10,7 +11,7 @@ def exp(alpha):
 
 
 if __name__ == "__main__":
-    alphas = [.8]
+    alphas = [.8, 2]
     for a in alphas:
         data = []
         for i in range(100000):

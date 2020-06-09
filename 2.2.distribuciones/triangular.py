@@ -2,6 +2,7 @@ import seaborn as sns
 import random as rn
 import matplotlib.pyplot as plt
 import math
+sns.set_style("white")
 
 
 def rand_triangular(a, b, c):
@@ -22,5 +23,5 @@ if __name__ == "__main__":
     data = []
     for i in range(10000):
         data.append(rand_triangular(1, 7, 5))
-    sns.distplot(data, kde=False, color="b")
+    sns.distplot(data, kde=False)
     plt.show()
