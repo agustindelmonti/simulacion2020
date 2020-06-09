@@ -1,9 +1,9 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pandas as pd
 import random as rn
 import numpy as np
-import math
+
+from utils import *
 
 
 def empirical_discrete(fx):
@@ -21,6 +21,7 @@ if __name__ == "__main__":
 
     data = []
     for i in range(10000):
-        data.append(empirical_discrete(fx1))
-    sns.distplot(data, kde=False, color="b")
+        data.append(empirical_discrete(fx0))
+
+    discrete_plot(data)
     plt.show()
