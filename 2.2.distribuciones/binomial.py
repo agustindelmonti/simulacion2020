@@ -1,15 +1,7 @@
 import matplotlib.pyplot as plt
-import random as rn
 
 from utils import *
-
-
-def bernoulli(p):
-    r = rn.random()
-    if r < p:
-        return 1
-    else:
-        return 0
+from bernoulli import *
 
 
 def binomial(n, p):
