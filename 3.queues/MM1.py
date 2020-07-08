@@ -8,9 +8,6 @@ if not os.path.exists(folder):
 
 def MM1(N,arrival_rate, service_rate):
 
-	if arrival_rate < service_rate:
-		print('Utilisation > 1')
-		return 
 
 	server_busy = False
 	queue = deque([])
@@ -69,10 +66,24 @@ def MM1(N,arrival_rate, service_rate):
 	return avg_system_time,avg_queue, utilisation
 
 
-if __name__ == "__main__":
 
-	for i in range(10):
-		avg_system_time,avg_queue, utilisation = MM1(100000,1.5,1)
-		print(f'Iteracion {i}')
-		print(f'Avg. time in system: {avg_system_time}\nAvg. queue length: {avg_queue}\nBusy: {utilisation * 100}%\n')
-	
+def simulate(mu):
+	n = 30
+	lambda_ = 2
+	avg_system_time = 0
+	avg_queue = 0
+	utilisation = 0
+	for i in range(n):
+		a,b,c = MM1(10000,lambda_,mu)
+
+		avg_system_time += a
+		avg_queue += b
+		utilisation += c
+        
+	print(f'λ = {lambda_}  μ = {1/mu} ratio = {mu/lambda_} \nAvg. time in system: {avg_system_time/n}\nAvg. queue length: {avg_queue/n}\nBusy: {utilisation/n * 100}%\n')
+
+
+if __name__ == "__main__":
+	mus = [.5,1,1.5,2,2.5]
+	for mu in mus:
+		simulate(mu)
